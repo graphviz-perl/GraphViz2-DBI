@@ -10,3 +10,4 @@ scripts/dbi.schema.pl
 scripts/sqlite.foreign.keys.pl
 t/test.t
 xt/author/pod.t
+xt/manifest.t
