@@ -443,6 +443,26 @@ If this naming convention does not hold, then both the source and destination po
 which is the port of the 1st column (in alphabetical order) in each table. The table name itself is
 port '0'.
 
+=head1 Scripts Shipped with this Module
+
+=head2 scripts/dbi.schema.pl
+
+If the environment vaiables DBI_DSN, DBI_USER and DBI_PASS are set (the latter 2 are optional [e.g. for SQLite]),
+then this demonstrates building a graph from a database schema.
+
+Also, for Postgres, you can set $ENV{DBI_SCHEMA} to a comma-separated list of schemas, e.g. when processing the
+MusicBrainz database. See scripts/dbi.schema.pl.
+
+For details, see L<http://blogs.perl.org/users/ron_savage/2013/03/graphviz2-and-the-dread-musicbrainz-db.html>.
+
+Outputs to ./html/dbi.schema.svg by default.
+
+=head2 scripts/sqlite.foreign.keys.pl
+
+Demonstrates how to find foreign key info by calling SQLite's pragma foreign_key_list.
+
+Outputs to STDOUT.
+
 =head1 Thanks
 
 Many thanks to the people who chose to make L<Graphviz|http://www.graphviz.org/> Open Source.
