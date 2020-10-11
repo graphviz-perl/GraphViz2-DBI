@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
+our $VERSION = '2.49';
+
 use DBIx::Admin::TableInfo;
 
 use GraphViz2;
@@ -16,20 +18,25 @@ has catalog =>
 (
 	default  => sub{return undef},
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 0,
 );
 
 has dbh =>
 (
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 1,
 );
 
 has graph =>
 (
-	default  => sub{return '' },
+	default  => sub {
+		GraphViz2 -> new(
+			edge   => {color => 'grey'},
+			global => {directed => 1},
+			graph  => {rankdir => 'TB'},
+			node   => {color => 'blue', shape => 'oval'},
+		)
+        },
 	is       => 'rw',
 	#isa     => 'GraphViz2',
 	required => 0,
@@ -39,7 +46,6 @@ has schema =>
 (
 	default  => sub{return undef},
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 0,
 );
 
@@ -47,7 +53,6 @@ has table =>
 (
 	default  => sub{return '%'},
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 0,
 );
 
@@ -55,7 +60,6 @@ has table_info =>
 (
 	default  => sub{return {} },
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 0,
 );
 
@@ -63,34 +67,8 @@ has type =>
 (
 	default  => sub{return 'TABLE'},
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 0,
 );
-
-our $VERSION = '2.49';
-
-# -----------------------------------------------
-
-sub BUILD
-{
-	my($self) = @_;
-
-	$self -> graph
-	(
-		$self -> graph ||
-		GraphViz2 -> new
-		(
-			edge   => {color => 'grey'},
-			global => {directed => 1},
-			graph  => {rankdir => 'TB'},
-			logger => '',
-			node   => {color => 'blue', shape => 'oval'},
-		)
-	);
-
-} # End of BUILD.
-
-# -----------------------------------------------
 
 sub create
 {
