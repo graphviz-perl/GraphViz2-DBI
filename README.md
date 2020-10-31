@@ -24,7 +24,7 @@
 
         my($g) = GraphViz2::DBI->new(dbh => $dbh, graph => $graph);
 
-        $g->create(name => '');
+        $g->create;
 
         my($format)      = shift || 'svg';
         my($output_file) = shift || File::Spec->catfile('html', "dbi.schema.$format");
@@ -71,7 +71,7 @@ Key-value pairs accepted in the parameter list:
 
 # Methods
 
-## create(exclude => \[\], include => \[\], name => $name)
+## create(exclude => \[\], include => \[\])
 
 Creates the graph, which is accessible via the graph() method, or via the graph object you passed to
 new().
@@ -91,11 +91,6 @@ Parameters:
     An optional arrayref of table names to include.
 
     If none are listed for inclusion, _all_ tables are included.
-
-- o name
-
-    $name is the string which will be placed in the root node of the tree.
-    It may be omitted, in which case the root node is omitted.
 
 ## graph()
 

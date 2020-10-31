@@ -61,7 +61,6 @@ has type => (
 
 sub create {
 	my ($self, %arg) = @_;
-	my $name       = $arg{name}    || '';
 	my $exclude    = $arg{exclude} || [];
 	my $include    = $arg{include} || [];
 	my $info       = DBIx::Admin::TableInfo->new(dbh => $self->dbh)->info;
@@ -126,12 +125,6 @@ sub create {
 			);
 		}
 	}
-	if ($name) {
-		$self->graph->add_node(name => $name, shape => 'doubleoctagon');
-		for my $table_name (sort keys %$info) {
-			$self->graph->add_edge(from => $name, to => $table_name);
-		}
-	}
 	return $self;
 }
 
@@ -165,7 +158,7 @@ L<GraphViz2::DBI> - Visualize a database schema as a graph
 
 	my($g) = GraphViz2::DBI->new(dbh => $dbh, graph => $graph);
 
-	$g->create(name => '');
+	$g->create;
 
 	my($format)      = shift || 'svg';
 	my($output_file) = shift || File::Spec->catfile('html', "dbi.schema.$format");
@@ -216,7 +209,7 @@ This key is optional.
 
 =head1 Methods
 
-=head2 create(exclude => [], include => [], name => $name)
+=head2 create(exclude => [], include => [])
 
 Creates the graph, which is accessible via the graph() method, or via the graph object you passed to
 new().
@@ -238,11 +231,6 @@ If none are listed for exclusion, I<all> tables are included.
 An optional arrayref of table names to include.
 
 If none are listed for inclusion, I<all> tables are included.
-
-=item o name
-
-$name is the string which will be placed in the root node of the tree.
-It may be omitted, in which case the root node is omitted.
 
 =back
 
