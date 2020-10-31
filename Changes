@@ -1,3 +1,5 @@
+- use combine_node_and_port => 0 from GraphViz2 2.58, new record API
+
 2.50 2020-10-11
 - fix bad logger default
 

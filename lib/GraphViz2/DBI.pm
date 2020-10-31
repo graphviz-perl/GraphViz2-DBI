@@ -26,11 +26,11 @@ has graph => (
 	default  => sub {
 		GraphViz2->new(
 			edge   => {color => 'grey'},
-			global => {directed => 1},
+			global => {directed => 1, combine_node_and_port => 0},
 			graph  => {rankdir => 'TB'},
 			node   => {color => 'blue', shape => 'oval'},
 		)
-        },
+	},
 	is       => 'rw',
 	#isa     => 'GraphViz2',
 	required => 0,
@@ -85,19 +85,14 @@ sub create {
 	}
 	for my $table_name (sort keys %$info) {
 		# Step 1: Make the table name + 'N columns-in-one' be a horizontal record.
-		my $label = [
-			{text => "<port0> $table_name"},
-		];
-		for my $column (sort keys %{$port{$table_name} }) {
-			push @$label, {
-				port => "<port$port{$table_name}{$column}>",
-				text => "$port{$table_name}{$column}: $column",
-			};
-		}
-		# Step 2: Make the N columns be a vertical record.
-		$$label[1]{port}        = "{$$label[1]{port}";
-		$$label[$#$label]{text} .= '}';
-		$self->graph->add_node(name => $table_name, label => [@$label]);
+		my $table_label = {port => 'port0', text => $table_name};
+		my @label = map +{
+			port => "port$port{$table_name}{$_}",
+			text => "$port{$table_name}{$_}: $_",
+		}, sort keys %{$port{$table_name}};
+		$self->graph->add_node(name => $table_name, label => [
+			$table_label, \@label
+		]);
 	}
 	my $vendor_name = uc $self->dbh->get_info(17);
 	my ($temp_1, $temp_2, $temp_3);
@@ -140,7 +135,12 @@ sub create {
 			} else {
 				$destination_port = 2;
 			}
-			$self->graph->add_edge(from => "$fk_table_name:port$source_port", to => "$table_name:port$destination_port");
+			$self->graph->add_edge(
+				from => $fk_table_name,
+				tailport => "port$source_port",
+				to => $table_name,
+				headport => "port$destination_port",
+			);
 		}
 	}
 	if ($name) {
