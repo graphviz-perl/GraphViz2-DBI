@@ -136,21 +136,7 @@ See ["FAQ" in DBIx::Admin::TableInfo](https://metacpan.org/pod/DBIx::Admin::Tabl
 
 ## How does GraphViz2::DBI draw edges from foreign keys to primary keys?
 
-It assumes that the primary table's name is a plural word, and that the foreign key's name is
-prefixed by the singular
-of the primary table's name, separated by '\_'.
-
-Thus a (primary) table 'people' with a primary key 'id' will be pointed to by a table
-'phone\_numbers' using a column 'person\_id'.
-
-Table 'phone\_numbers' will probably have a primary key 'id' but that is not used (unless some other
-table has a foreign key pointing to the 'phone\_numbers' table).
-
-The conversion of plural to singular is done with [Lingua::EN::PluralToSingular](https://metacpan.org/pod/Lingua::EN::PluralToSingular).
-
-If this naming convention does not hold, then both the source and destination ports default to '1',
-which is the port of the 1st column (in alphabetical order) in each table. The table name itself is
-port '0'.
+It uses [DBIx::Admin::TableInfo](https://metacpan.org/pod/DBIx::Admin::TableInfo).
 
 # Scripts Shipped with this Module
 

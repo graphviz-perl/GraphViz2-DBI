@@ -1,4 +1,5 @@
 - use combine_node_and_port => 0 from GraphViz2 2.58, new record API
+- stop using special cases and heuristics for FKs, just use DBI
 
 2.50 2020-10-11
 - fix bad logger default

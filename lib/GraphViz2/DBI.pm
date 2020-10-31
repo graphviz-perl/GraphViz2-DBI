@@ -8,7 +8,6 @@ our $VERSION = '2.50';
 
 use DBIx::Admin::TableInfo;
 use GraphViz2;
-use Lingua::EN::PluralToSingular 'to_singular';
 use Moo;
 
 has catalog => (
@@ -108,7 +107,6 @@ sub create {
 			my $source_port    = $fk_column_name ? $port{$fk_table_name}{$fk_column_name} : 2;
 			my ($primary_key_name, $destination_port);
 			if ($pk_table_name) {
-				my $singular_name = to_singular($pk_table_name);
 				if (defined($$info{$table_name}{columns}{$fk_column_name}) ) {
 					$primary_key_name = $fk_column_name;
 				} elsif (defined($$info{$table_name}{columns}{id}) ) {
@@ -116,7 +114,6 @@ sub create {
 				} else {
 					die "Primary table '$pk_table_name'. Foreign table '$fk_table_name'. Unable to find primary key name for foreign key '$fk_column_name'\n"
 				}
-				$primary_key_name =~ s/${singular_name}_//;
 				$destination_port = ($primary_key_name eq 'id') ? '0:w' : $port{$table_name}{$primary_key_name};
 			} else {
 				$destination_port = 2;
@@ -292,21 +289,7 @@ See L<DBIx::Admin::TableInfo/FAQ>.
 
 =head2 How does GraphViz2::DBI draw edges from foreign keys to primary keys?
 
-It assumes that the primary table's name is a plural word, and that the foreign key's name is
-prefixed by the singular
-of the primary table's name, separated by '_'.
-
-Thus a (primary) table 'people' with a primary key 'id' will be pointed to by a table
-'phone_numbers' using a column 'person_id'.
-
-Table 'phone_numbers' will probably have a primary key 'id' but that is not used (unless some other
-table has a foreign key pointing to the 'phone_numbers' table).
-
-The conversion of plural to singular is done with L<Lingua::EN::PluralToSingular>.
-
-If this naming convention does not hold, then both the source and destination ports default to '1',
-which is the port of the 1st column (in alphabetical order) in each table. The table name itself is
-port '0'.
+It uses L<DBIx::Admin::TableInfo>.
 
 =head1 Scripts Shipped with this Module
 

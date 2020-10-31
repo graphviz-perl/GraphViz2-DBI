@@ -11,7 +11,6 @@ WriteMakefile(
   PREREQ_PM => {
     'GraphViz2' => '2.58',
     'DBIx::Admin::TableInfo' => '3.00',
-    'Lingua::EN::PluralToSingular' => '0.14',
     'Moo' => '2.001001',
   },
   TEST_REQUIRES => {
