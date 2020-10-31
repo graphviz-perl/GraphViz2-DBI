@@ -10,12 +10,6 @@ use DBIx::Admin::TableInfo;
 use GraphViz2;
 use Moo;
 
-has catalog => (
-	default  => sub{return undef},
-	is       => 'rw',
-	required => 0,
-);
-
 has dbh => (
 	is       => 'rw',
 	required => 1,
@@ -35,30 +29,6 @@ has graph => (
 	required => 0,
 );
 
-has schema => (
-	default  => sub{return undef},
-	is       => 'rw',
-	required => 0,
-);
-
-has table => (
-	default  => sub{return '%'},
-	is       => 'rw',
-	required => 0,
-);
-
-has table_info => (
-	default  => sub{return {} },
-	is       => 'rw',
-	required => 0,
-);
-
-has type => (
-	default  => sub{return 'TABLE'},
-	is       => 'rw',
-	required => 0,
-);
-
 sub create {
 	my ($self, %arg) = @_;
 	my $exclude    = $arg{exclude} || [];
@@ -71,7 +41,6 @@ sub create {
 	if ($#$include >= 0) {
 		delete $$info{$_} for grep{! $include{$_} } keys %$info;
 	}
-	$self->table_info($info);
 	my %port;
 	for my $table_name (sort keys %$info) {
 		my $port = 0;
