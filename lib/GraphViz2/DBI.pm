@@ -76,23 +76,17 @@ sub create {
 	$self->table_info($info);
 	my %port;
 	for my $table_name (sort keys %$info) {
-		# Port 1 is the table name.
-		my $port           = 0;
-		$port{$table_name} = {};
-		for my $column_name (sort map{s/^"(.+)"$/$1/; $_} keys %{$$info{$table_name}{columns} }) {
-			$port{$table_name}{$column_name} = ++$port;
-		}
-	}
-	for my $table_name (sort keys %$info) {
-		# Step 1: Make the table name + 'N columns-in-one' be a horizontal record.
-		my $table_label = {port => 'port0', text => $table_name};
-		my @label = map +{
-			port => "port$port{$table_name}{$_}",
-			text => "$port{$table_name}{$_}: $_",
-		}, sort keys %{$port{$table_name}};
+		my $port = 0;
+		my %thisport = map +($_ => ++$port),
+			sort map{s/^"(.+)"$/$1/; $_} keys %{$$info{$table_name}{columns} };
 		$self->graph->add_node(name => $table_name, label => [
-			$table_label, \@label
+			{port => 'port0', text => $table_name},
+			[ map +{
+				port => "port$thisport{$_}",
+				text => "$thisport{$_}: $_",
+			}, sort keys %thisport ],
 		]);
+		$port{$table_name} = \%thisport;
 	}
 	my $vendor_name = uc $self->dbh->get_info(17);
 	my ($temp_1, $temp_2, $temp_3);
@@ -109,18 +103,15 @@ sub create {
 	my %special_fk_column = (
 		spouse_id => 'person_id',
 	);
-	my $destination_port;
-	my($fk_column_name, $fk_table_name);
-	my($pk_table_name, $primary_key_name);
-	my($singular_name, $source_port);
 	for my $table_name (sort keys %$info) {
 		for my $item (@{$$info{$table_name}{foreign_keys} }) {
-			$pk_table_name  = $$item{$temp_1};
-			$fk_table_name  = $$item{$temp_2};
-			$fk_column_name = $$item{$temp_3};
-			$source_port    = $fk_column_name ? $port{$fk_table_name}{$fk_column_name} : 2;
+			my $pk_table_name  = $$item{$temp_1};
+			my $fk_table_name  = $$item{$temp_2};
+			my $fk_column_name = $$item{$temp_3};
+			my $source_port    = $fk_column_name ? $port{$fk_table_name}{$fk_column_name} : 2;
+			my ($primary_key_name, $destination_port);
 			if ($pk_table_name) {
-				$singular_name = to_singular($pk_table_name);
+				my $singular_name = to_singular($pk_table_name);
 				if ($special_fk_column{$fk_column_name}) {
 					$primary_key_name = $special_fk_column{$fk_column_name};
 				} elsif (defined($$info{$table_name}{columns}{$fk_column_name}) ) {
