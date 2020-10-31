@@ -100,9 +100,6 @@ sub create {
 		$temp_2 = 'FK_TABLE_NAME';
 		$temp_3 = 'FK_COLUMN_NAME';
 	}
-	my %special_fk_column = (
-		spouse_id => 'person_id',
-	);
 	for my $table_name (sort keys %$info) {
 		for my $item (@{$$info{$table_name}{foreign_keys} }) {
 			my $pk_table_name  = $$item{$temp_1};
@@ -112,9 +109,7 @@ sub create {
 			my ($primary_key_name, $destination_port);
 			if ($pk_table_name) {
 				my $singular_name = to_singular($pk_table_name);
-				if ($special_fk_column{$fk_column_name}) {
-					$primary_key_name = $special_fk_column{$fk_column_name};
-				} elsif (defined($$info{$table_name}{columns}{$fk_column_name}) ) {
+				if (defined($$info{$table_name}{columns}{$fk_column_name}) ) {
 					$primary_key_name = $fk_column_name;
 				} elsif (defined($$info{$table_name}{columns}{id}) ) {
 					$primary_key_name = 'id';
@@ -269,13 +264,6 @@ foreign table/key pair point to.
 The steps are listed here, in the order they are tested. The first match stops the search.
 
 =over 4
-
-=item o Check a hash for special cases
-
-Currently, the only special case is a foreign key of C<spouse_id>. It is assumed to point to a
-primary key called C<person_id>.
-
-There is no option available, at the moment, to override this check.
 
 =item o Ask the database for foreign key information
 

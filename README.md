@@ -111,13 +111,6 @@ foreign table/key pair point to.
 
 The steps are listed here, in the order they are tested. The first match stops the search.
 
-- o Check a hash for special cases
-
-    Currently, the only special case is a foreign key of `spouse_id`. It is assumed to point to a
-    primary key called `person_id`.
-
-    There is no option available, at the moment, to override this check.
-
 - o Ask the database for foreign key information
 
     [DBIx::Admin::TableInfo](https://metacpan.org/pod/DBIx::Admin::TableInfo) is used for this.
