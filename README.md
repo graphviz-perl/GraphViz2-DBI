@@ -4,39 +4,32 @@
 
 # Synopsis
 
-        #!/usr/bin/env perl
-
-        use strict;
-        use warnings;
-
         use DBI;
-
         use GraphViz2;
         use GraphViz2::DBI;
 
         exit 0 if (! $ENV{DBI_DSN});
 
-        my($graph) = GraphViz2 -> new
-                (
-                 edge   => {color => 'grey'},
-                 global => {directed => 1},
-                 graph  => {rankdir => 'TB'},
-                 node   => {color => 'blue', shape => 'oval'},
-                );
+        my($graph) = GraphViz2->new (
+                edge   => {color => 'grey'},
+                global => {directed => 1},
+                graph  => {rankdir => 'TB'},
+                node   => {color => 'blue', shape => 'oval'},
+        );
         my($attr)              = {};
         $$attr{sqlite_unicode} = 1 if ($ENV{DBI_DSN} =~ /SQLite/i);
-        my($dbh)               = DBI -> connect($ENV{DBI_DSN}, $ENV{DBI_USER}, $ENV{DBI_PASS}, $attr);
+        my($dbh)               = DBI->connect($ENV{DBI_DSN}, $ENV{DBI_USER}, $ENV{DBI_PASS}, $attr);
 
-        $dbh -> do('PRAGMA foreign_keys = ON') if ($ENV{DBI_DSN} =~ /SQLite/i);
+        $dbh->do('PRAGMA foreign_keys = ON') if ($ENV{DBI_DSN} =~ /SQLite/i);
 
-        my($g) = GraphViz2::DBI -> new(dbh => $dbh, graph => $graph);
+        my($g) = GraphViz2::DBI->new(dbh => $dbh, graph => $graph);
 
-        $g -> create(name => '');
+        $g->create(name => '');
 
         my($format)      = shift || 'svg';
-        my($output_file) = shift || File::Spec -> catfile('html', "dbi.schema.$format");
+        my($output_file) = shift || File::Spec->catfile('html', "dbi.schema.$format");
 
-        $graph -> run(format => $format, output_file => $output_file);
+        $graph->run(format => $format, output_file => $output_file);
 
 See scripts/dbi.schema.pl (["Scripts Shipped with this Module" in GraphViz2](https://metacpan.org/pod/GraphViz2#Scripts-Shipped-with-this-Module)).
 
@@ -55,7 +48,7 @@ Here is the list of [output formats](http://www.graphviz.org/content/output-form
 
 ## Calling new()
 
-`new()` is called as `my($obj) = GraphViz2::DBI -> new(k1 => v1, k2 => v2, ...)`.
+`new()` is called as `my($obj) = GraphViz2::DBI->new(k1 => v1, k2 => v2, ...)`.
 
 It returns a new object of type `GraphViz2::DBI`.
 
@@ -71,7 +64,7 @@ Key-value pairs accepted in the parameter list:
 
     This option specifies the GraphViz2 object to use. This allows you to configure it as desired.
 
-    The default is GraphViz2 -> new. The default attributes are the same as in the synopsis, above,
+    The default is GraphViz2->new. The default attributes are the same as in the synopsis, above,
     except for the graph label of course.
 
     This key is optional.
