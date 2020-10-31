@@ -31,21 +31,14 @@ has graph => (
 
 sub create {
 	my ($self, %arg) = @_;
-	my $exclude    = $arg{exclude} || [];
-	my $include    = $arg{include} || [];
-	my $info       = DBIx::Admin::TableInfo->new(dbh => $self->dbh)->info;
-	my %include;
-	@include{@$include} = (1) x @$include;
-	delete $$info{$_} for @$exclude;
-	# This 'if' stops us excluding all tables :-).
-	if ($#$include >= 0) {
-		delete $$info{$_} for grep{! $include{$_} } keys %$info;
-	}
+	my $start_info = DBIx::Admin::TableInfo->new(dbh => $self->dbh)->info;
+	delete @$start_info{ @{ $arg{exclude} || [] } };
+	my %info = map +($_=>$$start_info{$_}), @{ $arg{include} || [keys %$start_info] };
 	my %port;
-	for my $table_name (sort keys %$info) {
+	for my $table_name (sort keys %info) {
 		my $port = 0;
 		my %thisport = map +($_ => ++$port),
-			sort map{s/^"(.+)"$/$1/; $_} keys %{$$info{$table_name}{columns} };
+			sort map{s/^"(.+)"$/$1/; $_} keys %{$info{$table_name}{columns} };
 		$self->graph->add_node(name => $table_name, label => [
 			{port => 'port0', text => $table_name},
 			[ map +{
@@ -67,17 +60,17 @@ sub create {
 		$temp_2 = 'FK_TABLE_NAME';
 		$temp_3 = 'FK_COLUMN_NAME';
 	}
-	for my $table_name (sort keys %$info) {
-		for my $item (@{$$info{$table_name}{foreign_keys} }) {
+	for my $table_name (sort keys %info) {
+		for my $item (@{ $info{$table_name}{foreign_keys} }) {
 			my $pk_table_name  = $$item{$temp_1};
 			my $fk_table_name  = $$item{$temp_2};
 			my $fk_column_name = $$item{$temp_3};
 			my $source_port    = $fk_column_name ? $port{$fk_table_name}{$fk_column_name} : 2;
 			my ($primary_key_name, $destination_port);
 			if ($pk_table_name) {
-				if (defined($$info{$table_name}{columns}{$fk_column_name}) ) {
+				if (defined($info{$table_name}{columns}{$fk_column_name}) ) {
 					$primary_key_name = $fk_column_name;
-				} elsif (defined($$info{$table_name}{columns}{id}) ) {
+				} elsif (defined($info{$table_name}{columns}{id}) ) {
 					$primary_key_name = 'id';
 				} else {
 					die "Primary table '$pk_table_name'. Foreign table '$fk_table_name'. Unable to find primary key name for foreign key '$fk_column_name'\n"

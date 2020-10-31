@@ -7,7 +7,7 @@ use GraphViz2::DBI;
 use DBI;
 
 my $dbh = DBI->connect("dbi:SQLite:dbname=:memory:", '', '');
-$dbh->do($_) for <<'EOF', <<'EOF';
+$dbh->do($_) for <<'EOF', <<'EOF', <<'EOF';
 CREATE TABLE "user" (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username VARCHAR(255) UNIQUE NOT NULL,
@@ -31,9 +31,14 @@ CREATE TABLE blog (
   published_date DATETIME DEFAULT CURRENT_TIMESTAMP
 )
 EOF
+CREATE TABLE zap (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title VARCHAR(255) NOT NULL
+)
+EOF
 
 my $g_dbi = GraphViz2::DBI->new(dbh => $dbh);
-$g_dbi->create(name => '');
+$g_dbi->create(exclude => ['zap']);
 my $g = $g_dbi->graph;
 is_deeply_dump($g->node_hash, {
   blog => {
